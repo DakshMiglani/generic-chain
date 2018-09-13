@@ -2,28 +2,22 @@ export type Next = () => any;
 
 export type MiddlewareResolver = (
   next: Next,
-  parent: any,
-  args: any,
-  context: any,
-  info: any
+  context: any
 ) => any;
 
 export const chain = (middlewares: MiddlewareResolver[]) => <
-  Parent = any,
-  Args = any,
-  Context = any,
-  Info = any
+  Context = any
 >(
-  resolver: (parent: Parent, args: Args, context: Context, info: Info) => any
-) => (parent: any, args: any, context: any, info: any) => {
+  resolver: (context: Context) => any
+) => (context: any) => {
   const newMiddlewares = [...middlewares];
   const next: Next = () => {
     const middleware = newMiddlewares.shift();
     if (middleware) {
-      return middleware(next, parent, args, context, info);
+      return middleware(next, context);
     }
 
-    return resolver(parent, args, context, info);
+    return resolver(context);
   };
 
   return next();
