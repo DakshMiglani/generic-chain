@@ -47,8 +47,9 @@ Run the Chain
 
 ```js
 
-const start = testMiddleware(() => {
-	// this function runs after chain has ended/
+const start = testMiddleware((ctx) => {
+  console.log("Oh, Hello", ctx)
+	// this function runs after chain has ended
 });
 
 start(ctx); // provide the context.
