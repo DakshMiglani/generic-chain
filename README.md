@@ -1,75 +1,26 @@
-# GraphQL Chain
+# Generic Chain
 
-Create GraphQL middleware that resembles how Express middleware works.
+Create Middleware by chaining functions. Based on [benawad/graphql-chain](https://github.com/benawad/graphql-chain)
 
 ## Install
 
 ```
-yarn add graphql-chain
+yarn add generic-chain
 ```
 
 ## How to use
 
 ### Step 1
 
-Create middleware
+Create middlewares
 
 ```js
-const validationMiddleware: MiddlewareResolver = (
+const validate: MiddlewareResolver = (
   next,
-  parent,
-  args,
-  context,
-  info
+  ctx
 ) => {
-  if (args.name.length > 10) {
+  if (ctx.name.length > 10) {
     throw new Error("too long");
-  }
-
-  return next();
-};
-```
-
-It has access to all the regular parameters a resolver gets plus a `next` parameter at the beginning which you call and return to call the next middleware or resolver.
-
-You don't always have to call the next middleware or resolver though. This can be helpful if you want create a caching middleware:
-
-```js
-const cachingMiddleware: MiddlewareResolver = async (next, _, args) => {
-  const data = await redis.get("hello:cache");
-  if (data) {
-    // found data in the cache, so return early
-    console.log("CACHE HIT");
-    return data;
-  }
-  // did not find data, so call the next middleware
-  console.log("CACHE MISS");
-  const result = await next();
-  // set cache for next call
-  await redis.set("hello:cache", result);
-  return result;
-};
-```
-
-You can also change the value of the arguments and then use them later
-
-```js
-const getUserMiddleware: MiddlewareResolver = async (next, _, __, context) => {
-  if (validToken(context.authToken)) {
-    // you can add properties to context that you can use later
-    context.user = await getUser(context.authToken);
-  }
-
-  return next();
-};
-```
-
-So you can then have a middleware that checks the user
-
-```js
-const authorizationMiddleware: MiddlewareResolver = (next, _, __, context) => {
-  if (!context.user || !context.user.admin) {
-    throw new Error("not authorized");
   }
 
   return next();
@@ -78,29 +29,26 @@ const authorizationMiddleware: MiddlewareResolver = (next, _, __, context) => {
 
 ### Step 2
 
-Chain as many middlewares together as you like
+Chain Middleware
 
-```js
-import { chain } from "graphql-chain";
+```
+import { chain } from "generic-chain";
 
-const helloMiddleware = chain([
-  getUserMiddleware,
-  authorizationMiddleware,
-  validationMiddleware
+// chain all your middlewares
+const testMiddleware = chain([
+  validate,
+  cache,
 ]);
 ```
 
 ### Step 3
 
-Wrap the resolver you want the middleware to run on
+Run the Chain
 
-```js
-const resolvers: IResolvers = {
-  Query: {
-    hello: helloMiddleware((_, { name }) => `Hello ${name || "World"}`)
-  }
-};
 ```
+const somethingHappened = () => testMiddleware();
+```
+
 
 The execution sequence will be `getUserMiddleware` -> `authorizationMiddleware` -> `validationMiddleware` -> `hello`
 
