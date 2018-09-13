@@ -1,7 +1,7 @@
 import { chain } from "./lib";
 
 describe("test chain", () => {
-  it("modifying argument persists", () => {
+  it("modifying context persists", () => {
     chain([
       (next, ctx) => {
         ctx.name = "hey";
@@ -11,6 +11,6 @@ describe("test chain", () => {
         expect(ctx.name).toBe("hey");
         return next();
       }
-    ])(() => 5)({}, {}, {}, {});
+    ])(() => 5)({});
   });
 });
