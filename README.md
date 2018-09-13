@@ -31,7 +31,7 @@ const validate: MiddlewareResolver = (
 
 Chain Middleware
 
-```
+```js
 import { chain } from "generic-chain";
 
 // chain all your middlewares
@@ -45,11 +45,12 @@ const testMiddleware = chain([
 
 Run the Chain
 
+```js
+
+const start = testMiddleware(() => {
+	// this function runs after chain has ended/
+});
+
+start(ctx); // provide the context.
+
 ```
-const somethingHappened = () => testMiddleware();
-```
-
-
-The execution sequence will be `getUserMiddleware` -> `authorizationMiddleware` -> `validationMiddleware` -> `hello`
-
-Checkout the `examples` directory for complete examples
